@@ -4,6 +4,12 @@ const express     = require('express');
 const bodyParser  = require('body-parser');
 const cors        = require('cors');
 const helmet      = require('helmet');
+const mongoose    = require('mongoose');
+
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 const apiRoutes         = require('./routes/api.js');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
@@ -11,14 +17,9 @@ const runner            = require('./test-runner');
 
 const app = express();
 
-app.use(helmet.frameguard({ action: 'deny' }));
-app.use(
-  helmet({
-    referrerPolicy: {
-      policy: "no-referrer",
-    },
-  })
-);
+app.use(helmet.frameguard({ action: 'sameorigin' }));
+app.use(helmet.dnsPrefetchControl({ allow: false }));
+app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
 
 app.use('/public', express.static(process.cwd() + '/public'));
 
